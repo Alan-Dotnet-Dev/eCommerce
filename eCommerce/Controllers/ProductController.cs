@@ -1,4 +1,7 @@
-﻿using Core.Interfaces;
+﻿using Core.Entities;
+using Core.Interfaces;
+using eCommerce.Core.Interfaces;
+using eCommerce.Core.Spesification;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,18 +14,23 @@ namespace eCommerce.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly IProductRepository _repo;
+        private readonly IGenericRepository<Product> _repoproduct;
+        private readonly IGenericRepository<ProductBrand> _repoBrand;
+        private readonly IGenericRepository<ProductType> _repoType;
 
-        public ProductController(IProductRepository repo)
+        public ProductController(IGenericRepository<Product> productRepo, IGenericRepository<ProductBrand> brandRepo, IGenericRepository<ProductType> typeRepo)
         {
-            _repo = repo;
+            _repoproduct = productRepo;
+            _repoBrand = brandRepo;
+            _repoType = typeRepo;
         }
 
         [HttpGet]
         public IActionResult GetProducts()
         {
-            
-            var products = _repo.GetProductAsycn();
+            var spec = new ProductwithTypeaAndBrands();
+
+            var products = _repoproduct.ListAsync(spec);
            
             return Ok(products);
         }
@@ -30,8 +38,9 @@ namespace eCommerce.Controllers
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)
         {
-            
-            var product = _repo.GetProductByIdAsycn(id);
+            var spec = new ProductwithTypeaAndBrands(id);
+
+            var product = _repoproduct.GetEntityWithSpec(spec);
 
             if (product == null)
             {
@@ -46,7 +55,7 @@ namespace eCommerce.Controllers
         public IActionResult GetProductBrand()
         {
 
-            var products = _repo.GetProductBrandAsycn();
+            var products = _repoBrand.GetAllAsync();
 
             return Ok(products);
         }
@@ -55,7 +64,7 @@ namespace eCommerce.Controllers
         public IActionResult GetProductType()
         {
 
-            var products = _repo.GetProductTypeAsycn();
+            var products = _repoType.GetAllAsync();
 
             return Ok(products);
         }

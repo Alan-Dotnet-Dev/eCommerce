@@ -4,6 +4,8 @@ using Infrastructure.Repository;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using eCommerce.Core.Interfaces;
+using eCommerce.Infrastructure.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,7 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 });
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
