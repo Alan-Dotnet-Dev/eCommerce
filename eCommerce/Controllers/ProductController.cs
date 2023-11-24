@@ -1,4 +1,5 @@
-﻿using Infrastructure.Data;
+﻿using Core.Interfaces;
+using Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SQLitePCL;
@@ -10,37 +11,53 @@ namespace eCommerce.Controllers
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly StoreContext _storeContext;
+        private readonly IProductRepository _repo;
 
-        public ProductController(StoreContext context)
+        public ProductController(IProductRepository repo)
         {
-            _storeContext = context;
+            _repo = repo;
         }
 
         [HttpGet]
         public IActionResult GetProducts()
         {
-            // Retrieve a list of products from the StoreContext
-            var products = _storeContext.Products.ToList();
-
-            // You can customize the response based on your requirements
+            
+            var products = _repo.GetProductAsycn();
+           
             return Ok(products);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetProductById(int id)
         {
-            // Retrieve a product by id from the StoreContext
-            var product = _storeContext.Products.FirstOrDefault(p => p.Id == id);
+            
+            var product = _repo.GetProductByIdAsycn(id);
 
             if (product == null)
             {
-                // Return a 404 Not Found if the product is not found
+               
                 return NotFound($"Product with Id {id} not found");
             }
 
-            // You can customize the response based on your requirements
             return Ok(product);
+        }
+
+        [HttpGet("brand")]
+        public IActionResult GetProductBrand()
+        {
+
+            var products = _repo.GetProductBrandAsycn();
+
+            return Ok(products);
+        }
+
+        [HttpGet("type")]
+        public IActionResult GetProductType()
+        {
+
+            var products = _repo.GetProductTypeAsycn();
+
+            return Ok(products);
         }
 
     }
