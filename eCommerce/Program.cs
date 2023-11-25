@@ -1,42 +1,17 @@
-using Core.Interfaces;
 using Infrastructure.Data;
-using Infrastructure.Repository;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-using eCommerce.Core.Interfaces;
-using eCommerce.Infrastructure.Repository;
+using eCommerce.API.Middleware;
+using eCommerce.API.Extension;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<StoreContext>(opt =>
-{
-    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
-
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("Logs/myapp-.txt", rollingInterval: RollingInterval.Day) // Log to a text file
-    .CreateLogger();
-
-builder.Services.AddLogging(builder =>
-{
-    builder.AddSerilog(); // Integrate Serilog with ASP.NET Core logging
-});
+builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseStatusCodePagesWithReExecute("/errors/{0}");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -44,10 +19,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles();
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
+
+app.UseMiddleware<ExceptionMiddleware>(); // Ensure this line is after other middleware registrations
 
 app.MapControllers();
 

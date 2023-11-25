@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Core.Entities;
 using Core.Interfaces;
+using eCommerce.API.Controllers;
+using eCommerce.API.Error;
 using eCommerce.Core.Entities;
 using eCommerce.Core.Interfaces;
 using eCommerce.Core.Spesification;
@@ -11,10 +13,8 @@ using SQLitePCL;
 
 namespace eCommerce.Controllers
 {
-
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductController : ControllerBase
+    
+    public class ProductController : BaseAPIController
     {
         private readonly IGenericRepository<Product> _repoproduct;
         private readonly IGenericRepository<ProductBrand> _repoBrand;
@@ -51,7 +51,7 @@ namespace eCommerce.Controllers
             if (product == null)
             {
                
-                return NotFound($"Product with Id {id} not found");
+                return NotFound(new ApiResponse(400));
             }
 
             var res = _mapper.Map<Product,ProductDTO>(product);
