@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@angular/cli": "14.2",
+    "@jridgewell/sourcemap-codec": "^1.4.15",
+    "@npmcli/fs": "^3.1.0"
+  }
+}
